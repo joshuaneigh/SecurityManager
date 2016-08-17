@@ -40,6 +40,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -238,6 +239,13 @@ public class Main extends Application implements Initializable {
 	}
 	
 	@FXML
+	private void handleMouseClicked(final MouseEvent event) {
+		if (event.getClickCount() == 2) {
+			handleEditEntry();
+		}
+	}
+	
+	@FXML
 	private void handleDeleteEntry() {
 		final Entry entry = dataTable.getSelectionModel().getSelectedItem();
 		if (entry != null) {
@@ -263,9 +271,16 @@ public class Main extends Application implements Initializable {
 	}
 	
 	@FXML
-	private void keyPressed(final KeyEvent event) {
-		if (event.getCode() == KeyCode.DELETE) {
+	private void handleKeyPressed(final KeyEvent event) {
+		switch (event.getCode()) {
+		case DELETE: 
 			handleDeleteEntry();
+			break;
+		case ENTER:
+			handleEditEntry();
+			break;
+		default:
+			break;
 		}
 	}
 

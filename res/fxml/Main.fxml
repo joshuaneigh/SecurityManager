@@ -29,7 +29,7 @@
                   <Button mnemonicParsing="false" onAction="#handleHelp" text="Help" />
               </items>
             </ToolBar>
-            <TableView fx:id="dataTable" onKeyPressed="#keyPressed" VBox.vgrow="ALWAYS">
+            <TableView fx:id="dataTable" onKeyPressed="#handleKeyPressed" onMouseClicked="#handleMouseClicked" VBox.vgrow="ALWAYS">
               <columns>
                 <TableColumn fx:id="titleColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="120.0" text="Title" />
                 <TableColumn fx:id="userNameColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="120.0" text="User Name" />
