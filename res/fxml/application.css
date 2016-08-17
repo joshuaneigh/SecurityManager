@@ -1,0 +1,17 @@
+.open-button {
+	-fx-background-image: url('./res/images/open.png');
+	-fx-background-repeat: no-repeat;
+	-fx-background-position: center;
+}
+
+.save-button {
+	-fx-background-image: url('./res/images/save.png');
+	-fx-background-repeat: no-repeat;
+	-fx-background-position: center;
+}
+
+.new-button {
+	-fx-background-image: url('./res/images/new.png');
+	-fx-background-repeat: no-repeat;
+	-fx-background-position: center;
+}
