@@ -1,10 +1,14 @@
 package model;
 
 import java.awt.AWTException;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
+import java.awt.image.ImageObserver;
+import java.awt.image.ImageProducer;
+import java.io.File;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
@@ -23,8 +27,12 @@ public class Tray {
 	
 	/**
 	 * Public constructor, which will show the {@link TrayIcon} in the {@link SystemTray} upon instantiation.
+	 * 
+	 * @param path the path to the {@link Image}.
+	 * @param tooltip the {@link String} tooltip to be shown.
 	 */
-	public Tray() {
+	public Tray(final String path, final String tooltip) {
+		trayIcon = new TrayIcon(createIcon(path), tooltip);
 		showIcon();
 	}
 	
@@ -47,6 +55,14 @@ public class Tray {
 	}
 	
 	/**
+	 * Sets the {@link Image} to be shown in the {@link SystemTray}.
+	 * @param path the path to the image.
+	 */
+	public void setImage(final String path) {
+		trayIcon.setImage(createIcon(path));
+	}
+	
+	/**
 	 * Hides the {@link TrayIcon} from the {@link SystemTray}.
 	 */
 	public void hideIcon() {
@@ -64,25 +80,22 @@ public class Tray {
 		} 
 		
 		try {
-			trayIcon = new TrayIcon(createIcon("/images/tray.png", "Tray Icon"));
 			trayIcon.setImageAutoSize(true);
-			final SystemTray tray = SystemTray.getSystemTray();
-			tray.add(trayIcon);
+			SystemTray.getSystemTray().add(trayIcon);
 		} catch (AWTException e) {
 			e.printStackTrace();
 		}
 	}
 	
 	/**
-	 * Creates and returns the {@link ImageIcon}on for use in the {@link SystemTray}.
+	 * Creates and returns the {@link ImageIcon} for use in the {@link SystemTray}.
 	 * 
 	 * @param path the path to the image
-	 * @param desc the description of the image
 	 * @return ImageIcon for TrayIcon
 	 */
-	private Image createIcon(final String path, final String desc) {
+	private Image createIcon(final String path) {
 		URL url = Main.class.getResource(path);
-		return new ImageIcon(url, desc).getImage();
+		return new ImageIcon(url).getImage();
 	}
 	
 }
