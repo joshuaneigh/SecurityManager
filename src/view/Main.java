@@ -109,6 +109,7 @@ public class Main extends Application implements Initializable {
 		} 
 		Platform.setImplicitExit(false);
 		primaryStage.initStyle(StageStyle.UNDECORATED);
+		primaryStage.getIcons().add(new Image(new FileInputStream("./res/images/icon.png")));
 		primaryStage.setOnCloseRequest(e -> handleCloseRequest(e));
 		primaryStage.show();
 		centerStage(primaryStage);
