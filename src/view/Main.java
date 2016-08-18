@@ -7,6 +7,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -21,6 +22,7 @@ import java.util.ResourceBundle;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ObservableObjectValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -41,8 +43,10 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -61,11 +65,14 @@ public class Main extends Application implements Initializable {
 	private static ObservableList<Entry> ENTRY_LIST;
 	private static Tray TRAY;
 
+	@FXML private FlowPane titlebar;
+	@FXML private ImageView icon;
 	@FXML private Text title;	
 	@FXML private Text searchClear;
 	@FXML private Text searchIcon;
 	@FXML private TextField searchField;
 	@FXML private Button maximizeButton;
+	@FXML private Button editButton;
 	@FXML private TableView<Entry> dataTable;
 	@FXML private TableColumn<Entry, String> titleColumn;
 	@FXML private TableColumn<Entry, String> userNameColumn;
@@ -100,14 +107,11 @@ public class Main extends Application implements Initializable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
-		primaryStage.getIcons().add(new Image(new FileInputStream("./res/images/icon.png")));
-		primaryStage.initStyle(StageStyle.UNDECORATED);
-		primaryStage.show();
-		Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
-        primaryStage.setX((primScreenBounds.getWidth() - primaryStage.getWidth()) / 2);
-        primaryStage.setY((primScreenBounds.getHeight() - primaryStage.getHeight()) / 2);
-		primaryStage.setOnCloseRequest(e -> handleCloseRequest(e));
 		Platform.setImplicitExit(false);
+		primaryStage.initStyle(StageStyle.UNDECORATED);
+		primaryStage.setOnCloseRequest(e -> handleCloseRequest(e));
+		primaryStage.show();
+		centerStage(primaryStage);
 	}
 	
 	@Override
@@ -115,16 +119,19 @@ public class Main extends Application implements Initializable {
 		setupTable();
 		setupSearchbar();
 		setupTray();
+		setupTitlebar();
 		
+		editButton.disableProperty().bind(Bindings.isEmpty(dataTable.getSelectionModel().getSelectedItems()));
+	}
+	
+	private static void centerStage(final Stage primaryStage) {
+		Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+        primaryStage.setX((primScreenBounds.getWidth() - primaryStage.getWidth()) / 2);
+        primaryStage.setY((primScreenBounds.getHeight() - primaryStage.getHeight()) / 2);
+	}
+	
+	private void setupTitlebar() {
 		title.setText("SecurityManager");
-		
-		final ContextMenu menu = dataTable.getContextMenu();
-		dataTable.setContextMenu(new ContextMenu());
-		dataTable.setRowFactory(tableView -> {
-			final TableRow<Entry> row = new TableRow<>();
-			row.contextMenuProperty().bind(Bindings.when(Bindings.isNotNull(row.itemProperty())).then(menu).otherwise((ContextMenu) null));
-			return row;
-		});
 	}
 	
 	private void setupTray() {
@@ -148,11 +155,26 @@ public class Main extends Application implements Initializable {
 		urlColumn.setCellValueFactory(new PropertyValueFactory<Entry, String>("url"));
 		notesColumn.setCellValueFactory(new PropertyValueFactory<Entry, String>("notes"));
 		expiresColumn.setCellValueFactory(new PropertyValueFactory<Entry, LocalDate>("expires"));
+		
+		dataTable.focusedProperty().addListener((observable, oldValue, newValue) -> {
+			if (!newValue) {
+				dataTable.getSelectionModel().select(null);
+			}
+		});
+		
+		final ContextMenu menu = dataTable.getContextMenu();
+		dataTable.setContextMenu(new ContextMenu());
+		dataTable.setRowFactory(tableView -> {
+			final TableRow<Entry> row = new TableRow<>();
+			row.contextMenuProperty().bind(Bindings.when(Bindings.isNotNull(row.itemProperty())).then(menu).otherwise((ContextMenu) null));
+			return row;
+		});
 	}
 	
 	private void setupSearchbar() {
-		searchClear.visibleProperty().bind(Bindings.isNotEmpty(searchField.textProperty()));
+		searchIcon.setScaleX(-1);
 		searchIcon.visibleProperty().bind(Bindings.isEmpty(searchField.textProperty()));
+		searchClear.visibleProperty().bind(Bindings.isNotEmpty(searchField.textProperty()));
         FilteredList<Entry> filteredData = new FilteredList<>(ENTRY_LIST, p -> true);
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(entry -> {
@@ -321,6 +343,9 @@ public class Main extends Application implements Initializable {
 			break;
 		case ENTER:
 			handleEditEntry();
+			break;
+		case ESCAPE:
+			dataTable.getSelectionModel().select(null);
 			break;
 		default:
 			break;

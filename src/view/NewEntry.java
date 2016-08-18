@@ -95,7 +95,9 @@ public class NewEntry implements Initializable {
 	private void handleKeyPressed(final KeyEvent event) {
 		switch (event.getCode()) {
 			case ENTER:
-				handleOkay();
+				if (!notes.isFocused()) {
+					handleOkay();
+				}
 				break;
 			case TAB:
 				if (notes.isFocused()) {

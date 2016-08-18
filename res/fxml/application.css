@@ -1,87 +1,112 @@
-.root {
-	-fx-border-color: black;
-	-fx-background-color: gray;
+#root-pane {
+	-fx-border-radius: 6;
+	-fx-border-color: silver;
+	-fx-border-style: solid;
+	-fx-border-width: 1;
+}
+
+#titlebar {
+}
+
+#icon {
+	-fx-image: url("../images/icon.png");
+}
+
+#title {
+	-fx-font-size: 12px;
+}
+
+#searchbar {
+	-fx-background-radius: 15;
+}
+
+#search-icon {
+	-fx-text-fill: silver;
 }
 
 #toolbar {
-	-fx-background-color: gray;
+	-fx-background-color: transparent;
 }
 
 #seperator {
-	-fx-background-color: gray;
+}
+
+#content {
+	-fx-background-color: transparent;
 }
 
 #table-view {
-	-fx-background-color: gray;
+	-fx-background-color: white;
+	-fx-border-radius: 3;
+	-fx-border-color: silver;
+	-fx-border-style: solid;
+	-fx-border-width: 1;
+}
+
+.button {
+	-fx-background-color: transparent;
+}
+
+.button:hover {
+	-fx-background-color: white;
+}
+
+.help-button {
+	-fx-background-color: transparent;
+	-fx-text-fill: silver;
+}
+
+.help-button:hover {
+	-fx-background-color: transparent;
+}
+
+.table-column {
 }
 
 .minimize-button {
-	-fx-background-radius: 0px;
-	-fx-background-color: gray;
+	-fx-background-radius: 31px;
+	-fx-background-insets: 3, 3, 3, 3;
+	-fx-background-color: transparent;
 	-fx-font-size: 12px;
 }
 
 .minimize-button:hover {
+	-fx-background-color: rgba(255, 255, 255, 0.75);
+}
+
+.minimize-button:pressed {
 	-fx-background-color: white;
 }
 
 .maximize-button {
-	-fx-background-radius: 0px;
-	-fx-background-color: gray;
+	-fx-background-radius: 31px;
+	-fx-background-insets: 3, 3, 3, 3;
+	-fx-background-color: transparent;
 	-fx-font-size: 15px;
 }
 
 .maximize-button:hover {
+	-fx-background-color: rgba(255, 255, 255, 0.75);
+}
+
+.maximize-button:pressed {
 	-fx-background-color: white;
 }
 
 .close-button {
-	-fx-background-radius: 0px;
-	-fx-background-color: gray;
+	-fx-background-radius: 31px;
+	-fx-background-insets: 3, 3, 3, 3;
+	-fx-background-color: transparent;
 	-fx-font-size: 16px;
 	-fx-font-family: "Eras Medium ITC";
 }
 
 .close-button:hover {
+	-fx-background-color: rgba(255, 0, 0, 0.75);
+	-fx-text-fill: white;
+}
+
+.close-button:pressed {
 	-fx-background-color: red;
 }
 
-.new-button {
-	-fx-background-color: gray;
-}
-
-.edit-button {
-	-fx-background-color: gray;
-}
-
-.open-button {
-	-fx-background-color: gray;
-}
-
-.save-button {
-	-fx-background-color: gray;
-}
-
-.okay-button {
-	-fx-background-color: gray;
-}
-
-.okay-button:hover {
-	-fx-background-color: white;
-}
-
-.cancel-button {
-	-fx-background-color: gray;
-}
-
-.cancel-button:hover {
-	-fx-background-color: white;
-}
-
-.help-button {
-	-fx-background-color: gray;
-}
-
-.table-column {
-	-fx-background-color: gray;
-}
