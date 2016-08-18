@@ -1,4 +1,4 @@
-#titlebar {
+.root {
 	-fx-border-color: black;
 	-fx-background-color: gray;
 }
@@ -15,6 +15,37 @@
 	-fx-background-color: gray;
 }
 
+.minimize-button {
+	-fx-background-radius: 0px;
+	-fx-background-color: gray;
+	-fx-font-size: 12px;
+}
+
+.minimize-button:hover {
+	-fx-background-color: white;
+}
+
+.maximize-button {
+	-fx-background-radius: 0px;
+	-fx-background-color: gray;
+	-fx-font-size: 15px;
+}
+
+.maximize-button:hover {
+	-fx-background-color: white;
+}
+
+.close-button {
+	-fx-background-radius: 0px;
+	-fx-background-color: gray;
+	-fx-font-size: 16px;
+	-fx-font-family: "Eras Medium ITC";
+}
+
+.close-button:hover {
+	-fx-background-color: red;
+}
+
 .new-button {
 	-fx-background-color: gray;
 }
@@ -29,6 +60,22 @@
 
 .save-button {
 	-fx-background-color: gray;
+}
+
+.okay-button {
+	-fx-background-color: gray;
+}
+
+.okay-button:hover {
+	-fx-background-color: white;
+}
+
+.cancel-button {
+	-fx-background-color: gray;
+}
+
+.cancel-button:hover {
+	-fx-background-color: white;
 }
 
 .help-button {

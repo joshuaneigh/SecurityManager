@@ -32,6 +32,7 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableColumn;
@@ -61,10 +62,10 @@ public class Main extends Application implements Initializable {
 	private static Tray TRAY;
 
 	@FXML private Text title;	
-	@FXML private Text maximizeButton;
 	@FXML private Text searchClear;
 	@FXML private Text searchIcon;
 	@FXML private TextField searchField;
+	@FXML private Button maximizeButton;
 	@FXML private TableView<Entry> dataTable;
 	@FXML private TableColumn<Entry, String> titleColumn;
 	@FXML private TableColumn<Entry, String> userNameColumn;
@@ -208,14 +209,17 @@ public class Main extends Application implements Initializable {
 	private void handleNewEntry() {
 		final Stage stage = new Stage();
 		try {
-			final Scene scene = new Scene(new FXMLLoader().load(new FileInputStream(FXML_PATH + "NewEntry.fxml")));
+			final FXMLLoader loader = new FXMLLoader();
+			final Scene scene = new Scene(loader.load(new FileInputStream(FXML_PATH + "NewEntry.fxml")));
+			final NewEntry controller = loader.getController();
+			controller.setTitle("New Entry");
 			scene.getStylesheets().add((new File(FXML_PATH + "application.css")).toURI().toURL().toExternalForm());
 			stage.setScene(scene);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
 		stage.initModality(Modality.APPLICATION_MODAL);
-		stage.setTitle("New Entry");
+		stage.initStyle(StageStyle.UNDECORATED);
 		stage.show();
 		Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
 		stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
@@ -230,6 +234,7 @@ public class Main extends Application implements Initializable {
 				final FXMLLoader loader = new FXMLLoader();
 				final Scene scene = new Scene(loader.load(new FileInputStream(FXML_PATH + "NewEntry.fxml")));
 				final NewEntry controller = loader.getController();
+				controller.setTitle("Edit Entry");
 				controller.setEntry(dataTable.getSelectionModel().getSelectedItem());
 				scene.getStylesheets().add((new File(FXML_PATH + "application.css")).toURI().toURL().toExternalForm());
 				stage.setScene(scene);
@@ -237,7 +242,7 @@ public class Main extends Application implements Initializable {
 				e.printStackTrace();
 			} 
 			stage.initModality(Modality.APPLICATION_MODAL);
-			stage.setTitle("Edit Entry");
+			stage.initStyle(StageStyle.UNDECORATED);
 			stage.show();
 			Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
 			stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);

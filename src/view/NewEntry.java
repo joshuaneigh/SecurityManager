@@ -19,6 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import model.Entry;
@@ -27,7 +28,8 @@ import model.PasswordGenerator;
 public class NewEntry implements Initializable {
 	
 	@FXML private VBox root;
-	@FXML private TextField title;
+	@FXML private Text title;
+	@FXML private TextField titleField;
 	@FXML private TextField username;
 	@FXML private TextField password;
 	@FXML private TextField passwordConfirm;
@@ -42,10 +44,14 @@ public class NewEntry implements Initializable {
 		passwordConfirm.setContextMenu(new ContextMenu());
 	}
 	
+	public void setTitle(final String text) {
+		title.setText(text);
+	}
+	
 	@FXML
 	private void handleOkay() {
 		if (isValid()) {
-			Main.addEntry(new Entry(title.getText(), username.getText(), password.getText(), 
+			Main.addEntry(new Entry(titleField.getText(), username.getText(), password.getText(), 
 					url.getText(), notes.getText(), expires.getValue()));
 			if (editedEntry != null) {
 				Main.removeEntry(editedEntry);
@@ -106,8 +112,13 @@ public class NewEntry implements Initializable {
 		}
 	}
 	
+	@FXML
+	private void handleCloseWindow() {
+		((Stage) root.getScene().getWindow()).close();
+	}
+	
 	public void setEntry(final Entry entry) {
-		title.setText(entry.getTitle());
+		titleField.setText(entry.getTitle());
 		username.setText(entry.getUsername());
 		password.setText(entry.getPassword());
 		passwordConfirm.setText(entry.getPassword());
@@ -119,7 +130,7 @@ public class NewEntry implements Initializable {
 	
 	private boolean isValid() {
 		
-		if (title.getText().isEmpty()) {
+		if (titleField.getText().isEmpty()) {
 			Alert alert = new Alert(AlertType.ERROR);
 			alert.setTitle("Warning");
 			alert.setContentText("Title cannot be empty.");

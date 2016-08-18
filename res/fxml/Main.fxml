@@ -14,8 +14,16 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane id="titlebar" stylesheets="@application.css" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.Main">
+<AnchorPane stylesheets="@application.css" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.Main">
    <children>
+      <Text fx:id="title" layoutX="14.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" text="title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+      <Button layoutX="484.0" layoutY="9.0" mnemonicParsing="false" onAction="#handleMinimizeWindow" prefHeight="31.0" prefWidth="50.0" styleClass="minimize-button" text="—" AnchorPane.rightAnchor="100.0" AnchorPane.topAnchor="0.0" />
+      <Button fx:id="maximizeButton" layoutX="534.0" layoutY="11.0" mnemonicParsing="false" onAction="#handleMaximizeWindow" prefHeight="31.0" prefWidth="50.0" styleClass="maximize-button" text="☐" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="0.0" />
+      <Button layoutX="574.0" layoutY="-4.0" mnemonicParsing="false" onAction="#handleCloseWindow" prefHeight="31.0" prefWidth="50.0" styleClass="close-button" text="X" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Button>
       <AnchorPane prefWidth="600.0" AnchorPane.bottomAnchor="1.0" AnchorPane.leftAnchor="1.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="35.0">
          <children>
             <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -66,21 +74,5 @@
             </Text>
          </children>
       </AnchorPane>
-      <Text layoutX="579.59375" layoutY="20.2578125" onMouseClicked="#handleCloseWindow" strokeType="OUTSIDE" strokeWidth="0.0" text="X" AnchorPane.rightAnchor="10.8125" AnchorPane.topAnchor="8.0">
-         <font>
-            <Font name="Eras Medium ITC" size="16.0" />
-         </font>
-      </Text>
-      <Text fx:id="maximizeButton" layoutX="537.0" layoutY="21.1865234375" onMouseClicked="#handleMaximizeWindow" strokeType="OUTSIDE" strokeWidth="0.0" text="☐" AnchorPane.rightAnchor="48.0" AnchorPane.topAnchor="7.0">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Text>
-      <Text layoutX="497.2734375" layoutY="14.0" onMouseClicked="#handleMinimizeWindow" strokeType="OUTSIDE" strokeWidth="0.0" text="_" AnchorPane.rightAnchor="92.6875" AnchorPane.topAnchor="-2.0">
-         <font>
-            <Font name="Eras Medium ITC" size="20.0" />
-         </font>
-      </Text>
-      <Text fx:id="title" layoutX="14.0" layoutY="24.0" strokeType="OUTSIDE" strokeWidth="0.0" text="title" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
    </children>
 </AnchorPane>
