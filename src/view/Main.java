@@ -83,7 +83,7 @@ public class Main extends Application implements Initializable {
 	static {
 		FXML_PATH = "./res/fxml/";
 		ENTRY_LIST = FXCollections.observableArrayList();
-		TRAY = new Tray();
+		TRAY = new Tray("/images/tray.png", "SecurityManager");
 	}
 
 	static void addEntry(final Entry entry) {
