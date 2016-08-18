@@ -1,5 +1,7 @@
 package view;
 
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -38,7 +40,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
@@ -46,14 +47,21 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-import javafx.util.Callback;
+import javafx.stage.StageStyle;
+import javafx.stage.Window;
+import javafx.stage.WindowEvent;
+
 import model.Entry;
+import model.Tray;
 
 public class Main extends Application implements Initializable {
 	
 	private static String FXML_PATH;
 	private static ObservableList<Entry> ENTRY_LIST;
+	private static Tray TRAY;
 
+	@FXML private Text title;	
+	@FXML private Text maximizeButton;
 	@FXML private Text searchClear;
 	@FXML private Text searchIcon;
 	@FXML private TextField searchField;
@@ -67,6 +75,7 @@ public class Main extends Application implements Initializable {
 	static {
 		FXML_PATH = "./res/fxml/";
 		ENTRY_LIST = FXCollections.observableArrayList();
+		TRAY = new Tray();
 	}
 
 	static void addEntry(final Entry entry) {
@@ -77,17 +86,72 @@ public class Main extends Application implements Initializable {
 		ENTRY_LIST.remove(entry);
 	}
 	
+	public static void main(final String[] args) {
+		launch(args);
+	}
+	
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+		try {
+			final Scene scene = new Scene(new FXMLLoader().load(new FileInputStream(FXML_PATH + "Main.fxml")));
+			scene.getStylesheets().add((new File(FXML_PATH + "application.css")).toURI().toURL().toExternalForm());
+			primaryStage.setScene(scene);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		primaryStage.getIcons().add(new Image(new FileInputStream("./res/images/icon.png")));
+		primaryStage.initStyle(StageStyle.UNDECORATED);
+		primaryStage.show();
+		Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
+        primaryStage.setX((primScreenBounds.getWidth() - primaryStage.getWidth()) / 2);
+        primaryStage.setY((primScreenBounds.getHeight() - primaryStage.getHeight()) / 2);
+		primaryStage.setOnCloseRequest(e -> handleCloseRequest(e));
+		Platform.setImplicitExit(false);
+	}
+	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		searchClear.visibleProperty().bind(Bindings.isNotEmpty(searchField.textProperty()));
-		searchIcon.visibleProperty().bind(Bindings.isEmpty(searchField.textProperty()));
+		setupTable();
+		setupSearchbar();
+		setupTray();
+		
+		title.setText("SecurityManager");
+		
+		final ContextMenu menu = dataTable.getContextMenu();
+		dataTable.setContextMenu(new ContextMenu());
+		dataTable.setRowFactory(tableView -> {
+			final TableRow<Entry> row = new TableRow<>();
+			row.contextMenuProperty().bind(Bindings.when(Bindings.isNotNull(row.itemProperty())).then(menu).otherwise((ContextMenu) null));
+			return row;
+		});
+	}
+	
+	private void setupTray() {
+		final PopupMenu menu = new PopupMenu("Popup");
+		
+		final MenuItem restore = new MenuItem("Restore...");
+		restore.addActionListener(e -> Platform.runLater(() -> ((Stage) dataTable.getScene().getWindow()).show()));
+		menu.add(restore);
+		
+		final MenuItem close = new MenuItem("Close");
+		close.addActionListener(e -> handleCloseWindow());
+		menu.add(close);
+		
+		TRAY.setPopupMenu(menu);
+		TRAY.setToolTip(null);
+	}
+	
+	private void setupTable() {
 		titleColumn.setCellValueFactory(new PropertyValueFactory<Entry, String>("title"));
 		userNameColumn.setCellValueFactory(new PropertyValueFactory<Entry, String>("username"));
 		urlColumn.setCellValueFactory(new PropertyValueFactory<Entry, String>("url"));
 		notesColumn.setCellValueFactory(new PropertyValueFactory<Entry, String>("notes"));
 		expiresColumn.setCellValueFactory(new PropertyValueFactory<Entry, LocalDate>("expires"));
-		dataTable.setItems(ENTRY_LIST);
-		
+	}
+	
+	private void setupSearchbar() {
+		searchClear.visibleProperty().bind(Bindings.isNotEmpty(searchField.textProperty()));
+		searchIcon.visibleProperty().bind(Bindings.isEmpty(searchField.textProperty()));
         FilteredList<Entry> filteredData = new FilteredList<>(ENTRY_LIST, p -> true);
         searchField.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredData.setPredicate(entry -> {
@@ -107,57 +171,31 @@ public class Main extends Application implements Initializable {
         SortedList<Entry> sortedData = new SortedList<>(filteredData);
         sortedData.comparatorProperty().bind(dataTable.comparatorProperty());
         dataTable.setItems(sortedData);
-		
-		final ContextMenu menu = dataTable.getContextMenu();
-		dataTable.setContextMenu(new ContextMenu());
-		dataTable.setRowFactory(
-			    new Callback<TableView<Entry>, TableRow<Entry>>() {
-			  @Override
-			  public TableRow<Entry> call(TableView<Entry> tableView) {
-			    final TableRow<Entry> row = new TableRow<>();
-			    row.contextMenuProperty().bind(
-			      Bindings.when(Bindings.isNotNull(row.itemProperty()))
-			      .then(menu)
-			      .otherwise((ContextMenu)null));
-			    return row;
-			  }
-			});
 	}
 	
-	@Override
-	public void start(Stage primaryStage) throws Exception {
+	@SuppressWarnings("unchecked")
+	private void openFile(final File file) {
 		try {
-			final Scene scene = new Scene(new FXMLLoader().load(new FileInputStream(FXML_PATH + "Main.fxml")));
-			primaryStage.setScene(scene);
+			final FileInputStream fis = new FileInputStream(file);
+			final ObjectInputStream ois = new ObjectInputStream(fis);
+			List<Entry> list = (ArrayList<Entry>) ois.readObject();
+			ois.close();
+			ENTRY_LIST.removeAll(ENTRY_LIST);
+			ENTRY_LIST.addAll(list);
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void saveFile(final File file) {
+		try {
+			final FileOutputStream fos = new FileOutputStream(file);
+			final ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(new ArrayList<Entry>(ENTRY_LIST));
+			oos.close();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
-		primaryStage.getIcons().add(new Image(new FileInputStream("./res/images/icon.png")));
-		primaryStage.setTitle("SecurityManager");
-		primaryStage.show();
-		Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
-        primaryStage.setX((primScreenBounds.getWidth() - primaryStage.getWidth()) / 2);
-        primaryStage.setY((primScreenBounds.getHeight() - primaryStage.getHeight()) / 2);
-        Platform.setImplicitExit(false);
-		primaryStage.setOnCloseRequest((event) -> {
-//			if (!isSaved) {
-				final ButtonType yes = new ButtonType("Yes");
-				final ButtonType no = new ButtonType("No");
-				final ButtonType cancel = new ButtonType("Cancel");
-				final Alert alert = new Alert(AlertType.CONFIRMATION);
-				alert.setTitle("Confirmation Dialog");
-				alert.setContentText("Would you like to save your changes?");
-				alert.getButtonTypes().setAll(yes, no, cancel);
-				Optional<ButtonType> result = alert.showAndWait();
-				if (result.get() == yes) {
-					handleSaveFile();
-				} else if (result.get() == cancel) {
-					event.consume();
-					return;
-				}
-				Platform.exit();
-//			}
-		});
+		}
 		
 	}
 	
@@ -283,35 +321,49 @@ public class Main extends Application implements Initializable {
 			break;
 		}
 	}
-
-	@SuppressWarnings("unchecked")
-	private void openFile(final File file) {
-		try {
-			final FileInputStream fis = new FileInputStream(file);
-			final ObjectInputStream ois = new ObjectInputStream(fis);
-			List<Entry> list = (ArrayList<Entry>) ois.readObject();
-			ois.close();
-			ENTRY_LIST.removeAll(ENTRY_LIST);
-			ENTRY_LIST.addAll(list);
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+	
+	@FXML
+	private void handleMinimizeWindow() {
+		((Stage) dataTable.getScene().getWindow()).hide();
 	}
 	
-	private void saveFile(final File file) {
-		try {
-			final FileOutputStream fos = new FileOutputStream(file);
-			final ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(new ArrayList<Entry>(ENTRY_LIST));
-			oos.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+	@FXML
+	private void handleMaximizeWindow() {
+		final Stage stage = (Stage) dataTable.getScene().getWindow();
+		stage.setMaximized(stage.isMaximized() ^ true);
+		maximizeButton.setUnderline(stage.isMaximized());
 	}
 	
-	public static void main(final String[] args) {
-		launch(args);
+	@FXML
+	private void handleCloseWindow() {
+		Platform.runLater(() -> {
+			final Window window = dataTable.getScene().getWindow();
+			final WindowEvent windowEvent = new WindowEvent(window, WindowEvent.WINDOW_CLOSE_REQUEST);
+			dataTable.getScene().getWindow().fireEvent(windowEvent);
+		});
+	}
+	
+	@FXML
+	private void handleCloseRequest(final WindowEvent e) {
+//		if (!isSaved) {
+			final ButtonType yes = new ButtonType("Yes");
+			final ButtonType no = new ButtonType("No");
+			final ButtonType cancel = new ButtonType("Cancel");
+			final Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("Confirmation Dialog");
+			alert.setContentText("Would you like to save your changes?");
+			alert.getButtonTypes().setAll(yes, no, cancel);
+			Optional<ButtonType> result = alert.showAndWait();
+			if (result.get() == yes) {
+				handleSaveFile();
+			} else if (result.get() == cancel) {
+				e.consume();
+				return;
+			}
+			TRAY.hideIcon();
+			Platform.exit();
+			System.exit(0);
+//		}
 	}
 
 }

@@ -1,17 +1,40 @@
-.open-button {
-	-fx-background-image: url('./res/images/open.png');
-	-fx-background-repeat: no-repeat;
-	-fx-background-position: center;
+#titlebar {
+	-fx-border-color: black;
+	-fx-background-color: gray;
 }
 
-.save-button {
-	-fx-background-image: url('./res/images/save.png');
-	-fx-background-repeat: no-repeat;
-	-fx-background-position: center;
+#toolbar {
+	-fx-background-color: gray;
+}
+
+#seperator {
+	-fx-background-color: gray;
+}
+
+#table-view {
+	-fx-background-color: gray;
 }
 
 .new-button {
-	-fx-background-image: url('./res/images/new.png');
-	-fx-background-repeat: no-repeat;
-	-fx-background-position: center;
+	-fx-background-color: gray;
+}
+
+.edit-button {
+	-fx-background-color: gray;
+}
+
+.open-button {
+	-fx-background-color: gray;
+}
+
+.save-button {
+	-fx-background-color: gray;
+}
+
+.help-button {
+	-fx-background-color: gray;
+}
+
+.table-column {
+	-fx-background-color: gray;
 }
