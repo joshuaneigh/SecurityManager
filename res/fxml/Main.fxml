@@ -21,47 +21,7 @@
 
 <AnchorPane id="root-pane" stylesheets="@application.css" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.Main">
    <children>
-      <Region layoutX="-7.0" layoutY="-7.0" prefHeight="15.0" prefWidth="15.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <cursor>
-            <Cursor fx:constant="NW_RESIZE" />
-         </cursor>
-      </Region>
-      <Region prefHeight="10.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="0.0">
-         <cursor>
-            <Cursor fx:constant="N_RESIZE" />
-         </cursor>
-      </Region>
-      <Region prefHeight="15.0" prefWidth="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <cursor>
-            <Cursor fx:constant="NE_RESIZE" />
-         </cursor>
-      </Region>
-      <Region prefWidth="10.0" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="15.0">
-         <cursor>
-            <Cursor fx:constant="E_RESIZE" />
-         </cursor>
-      </Region>
-      <Region prefHeight="15.0" prefWidth="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
-         <cursor>
-            <Cursor fx:constant="SE_RESIZE" />
-         </cursor>
-      </Region>
-      <Region prefHeight="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0">
-         <cursor>
-            <Cursor fx:constant="S_RESIZE" />
-         </cursor>
-      </Region>
-      <Region prefHeight="15.0" prefWidth="15.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
-         <cursor>
-            <Cursor fx:constant="SW_RESIZE" />
-         </cursor>
-      </Region>
-      <Region prefWidth="10.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="15.0">
-         <cursor>
-            <Cursor fx:constant="W_RESIZE" />
-         </cursor>
-      </Region>
-      <FlowPane id="titlebar" fx:id="titlebar" alignment="CENTER_LEFT" hgap="5.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="35.0" prefWidth="35.0" rowValignment="TOP" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <FlowPane id="titlebar" fx:id="titlebar" alignment="CENTER_LEFT" hgap="5.0" minHeight="-Infinity" minWidth="-Infinity" onMouseDragged="#handleDragged" onMousePressed="#handleDragStarted" prefHeight="35.0" prefWidth="35.0" rowValignment="TOP" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <ImageView id="icon" fx:id="icon" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true" />
             <Text id="title" fx:id="title" strokeType="OUTSIDE" strokeWidth="0.0" text="Title" textOrigin="CENTER" />
@@ -130,5 +90,45 @@
             </Text>
          </children>
       </AnchorPane>
+      <Region layoutX="-7.0" layoutY="-7.0" prefHeight="10.0" prefWidth="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <cursor>
+            <Cursor fx:constant="NW_RESIZE" />
+         </cursor>
+      </Region>
+      <Region prefHeight="5.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="0.0">
+         <cursor>
+            <Cursor fx:constant="N_RESIZE" />
+         </cursor>
+      </Region>
+      <Region prefHeight="10.0" prefWidth="10.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <cursor>
+            <Cursor fx:constant="NE_RESIZE" />
+         </cursor>
+      </Region>
+      <Region prefWidth="5.0" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="15.0">
+         <cursor>
+            <Cursor fx:constant="E_RESIZE" />
+         </cursor>
+      </Region>
+      <Region prefHeight="10.0" prefWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <cursor>
+            <Cursor fx:constant="SE_RESIZE" />
+         </cursor>
+      </Region>
+      <Region prefHeight="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0">
+         <cursor>
+            <Cursor fx:constant="S_RESIZE" />
+         </cursor>
+      </Region>
+      <Region prefHeight="10.0" prefWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
+         <cursor>
+            <Cursor fx:constant="SW_RESIZE" />
+         </cursor>
+      </Region>
+      <Region prefWidth="5.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="15.0">
+         <cursor>
+            <Cursor fx:constant="W_RESIZE" />
+         </cursor>
+      </Region>
    </children>
 </AnchorPane>

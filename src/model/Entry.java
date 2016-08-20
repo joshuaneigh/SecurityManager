@@ -5,6 +5,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -31,7 +34,6 @@ public class Entry implements Serializable {
 	}
 	
 	private void writeObject(ObjectOutputStream oos) throws IOException {
-//        oos.defaultWriteObject();
         oos.writeObject(getTitle());
         oos.writeObject(getUsername());
         oos.writeObject(getPassword());
@@ -41,7 +43,6 @@ public class Entry implements Serializable {
     }
 
     private void readObject(ObjectInputStream ois) throws IOException, ClassNotFoundException {
-//        ois.defaultReadObject();
         title = new SimpleStringProperty((String) ois.readObject());
         username = new SimpleStringProperty((String) ois.readObject());
         password = new SimpleStringProperty((String) ois.readObject());

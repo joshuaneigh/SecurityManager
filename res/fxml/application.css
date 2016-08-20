@@ -1,4 +1,5 @@
 #root-pane {
+	-fx-background-radius: 6;
 	-fx-border-radius: 6;
 	-fx-border-color: silver;
 	-fx-border-style: solid;
@@ -108,5 +109,26 @@
 
 .close-button:pressed {
 	-fx-background-color: red;
+}
+
+.notification-root {
+	-fx-background-color: rgba(0, 0, 0, 0.7);
+	-fx-background-radius: 6;
+}
+
+#notification-title {
+	-fx-font-size: 12pt;
+    -fx-font-family: "Verdana";
+    -fx-text-fill: white;
+}
+
+#notification-icon {
+	
+}
+
+#notification-message {
+	-fx-font-size: 10pt;
+    -fx-font-family: "Verdana";
+    -fx-text-fill: white;
 }
 

@@ -7,7 +7,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,11 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.value.ObservableObjectValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -64,6 +65,11 @@ public class Main extends Application implements Initializable {
 	private static String FXML_PATH;
 	private static ObservableList<Entry> ENTRY_LIST;
 	private static Tray TRAY;
+	
+	private final ScheduledExecutorService scheduler;
+	
+	private double mouseX;
+	private double mouseY;
 
 	@FXML private FlowPane titlebar;
 	@FXML private ImageView icon;
@@ -86,6 +92,16 @@ public class Main extends Application implements Initializable {
 		TRAY = new Tray("/images/tray.png", "SecurityManager");
 	}
 
+	public Main() {
+		scheduler = Executors.newScheduledThreadPool(1);
+		scheduler.schedule(new Runnable() {
+			@Override
+			public void run() {
+				checkExpirationDates();
+			}
+		}, 1L, TimeUnit.DAYS);
+	}
+	
 	static void addEntry(final Entry entry) {
 		ENTRY_LIST.add(entry);
 	}
@@ -106,9 +122,10 @@ public class Main extends Application implements Initializable {
 			primaryStage.setScene(scene);
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		}
 		Platform.setImplicitExit(false);
-		primaryStage.initStyle(StageStyle.UNDECORATED);
+		primaryStage.initStyle(StageStyle.TRANSPARENT);
+		primaryStage.setTitle("SecurityManager");
 		primaryStage.getIcons().add(new Image(new FileInputStream("./res/images/icon.png")));
 		primaryStage.setOnCloseRequest(e -> handleCloseRequest(e));
 		primaryStage.show();
@@ -123,6 +140,73 @@ public class Main extends Application implements Initializable {
 		setupTitlebar();
 		
 		editButton.disableProperty().bind(Bindings.isEmpty(dataTable.getSelectionModel().getSelectedItems()));
+	}
+	
+	public void checkExpirationDates() {
+		int expiredCounter = 0;
+		String expired = null;
+		for (final Entry entry : ENTRY_LIST) {
+			if (entry.getExpires() != null && entry.getExpires().compareTo(LocalDate.now()) <= 0) {
+				expiredCounter++;
+				expired = entry.getTitle();
+				// TODO: Set cell to red
+			}
+		}
+		
+		final String message;
+		final int messageType;
+		if (expiredCounter > 1) {
+			message = "Your password, " + expired + ", and \n" + expiredCounter + " others have expired.";
+			messageType = Notification.WARNING;
+		} else if (expiredCounter == 1) {
+			message = "Your password, " + expired + ",\n has expired.";
+			messageType = Notification.WARNING;
+		} else {
+			message = "All passwords are up to date.";
+			messageType = Notification.SUCCESS;
+		}
+
+		final Stage stage = new Stage();
+		try {
+			final FXMLLoader loader = new FXMLLoader();
+			final Scene scene = new Scene(loader.load(new FileInputStream(FXML_PATH + "Notification.fxml")));
+			final Notification controller = loader.getController();
+			controller.setMessageType(messageType);
+			controller.setMessage(message);
+			scene.setFill(null);
+			scene.getStylesheets().add((new File(FXML_PATH + "application.css")).toURI().toURL().toExternalForm());
+			stage.setScene(scene);
+			controller.show();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void openFile(final File file) {
+		try {
+			final FileInputStream fis = new FileInputStream(file);
+			final ObjectInputStream ois = new ObjectInputStream(fis);
+			List<Entry> list = (ArrayList<Entry>) ois.readObject();
+			ois.close();
+			ENTRY_LIST.removeAll(ENTRY_LIST);
+			ENTRY_LIST.addAll(list);
+			checkExpirationDates();
+		} catch (IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void saveFile(final File file) {
+		try {
+			final FileOutputStream fos = new FileOutputStream(file);
+			final ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(new ArrayList<Entry>(ENTRY_LIST));
+			oos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 	
 	private static void centerStage(final Stage primaryStage) {
@@ -197,32 +281,6 @@ public class Main extends Application implements Initializable {
         dataTable.setItems(sortedData);
 	}
 	
-	@SuppressWarnings("unchecked")
-	private void openFile(final File file) {
-		try {
-			final FileInputStream fis = new FileInputStream(file);
-			final ObjectInputStream ois = new ObjectInputStream(fis);
-			List<Entry> list = (ArrayList<Entry>) ois.readObject();
-			ois.close();
-			ENTRY_LIST.removeAll(ENTRY_LIST);
-			ENTRY_LIST.addAll(list);
-		} catch (IOException | ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private void saveFile(final File file) {
-		try {
-			final FileOutputStream fos = new FileOutputStream(file);
-			final ObjectOutputStream oos = new ObjectOutputStream(fos);
-			oos.writeObject(new ArrayList<Entry>(ENTRY_LIST));
-			oos.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-	}
-	
 	@FXML
 	private void handleClearSearch() {
 		searchField.setText("");
@@ -243,8 +301,8 @@ public class Main extends Application implements Initializable {
 		} 
 		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.initStyle(StageStyle.UNDECORATED);
+		final Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
 		stage.show();
-		Rectangle2D primScreenBounds = Screen.getPrimary().getVisualBounds();
 		stage.setX((primScreenBounds.getWidth() - stage.getWidth()) / 2);
 		stage.setY((primScreenBounds.getHeight() - stage.getHeight()) / 2);
 	}
@@ -376,25 +434,35 @@ public class Main extends Application implements Initializable {
 	
 	@FXML
 	private void handleCloseRequest(final WindowEvent e) {
-//		if (!isSaved) {
-			final ButtonType yes = new ButtonType("Yes");
-			final ButtonType no = new ButtonType("No");
-			final ButtonType cancel = new ButtonType("Cancel");
-			final Alert alert = new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("Confirmation Dialog");
-			alert.setContentText("Would you like to save your changes?");
-			alert.getButtonTypes().setAll(yes, no, cancel);
-			Optional<ButtonType> result = alert.showAndWait();
-			if (result.get() == yes) {
-				handleSaveFile();
-			} else if (result.get() == cancel) {
-				e.consume();
-				return;
-			}
-			TRAY.hideIcon();
-			Platform.exit();
-			System.exit(0);
-//		}
+		final ButtonType yes = new ButtonType("Yes");
+		final ButtonType no = new ButtonType("No");
+		final ButtonType cancel = new ButtonType("Cancel");
+		final Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Confirmation Dialog");
+		alert.setContentText("Would you like to save your changes?");
+		alert.getButtonTypes().setAll(yes, no, cancel);
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == yes) {
+			handleSaveFile();
+		} else if (result.get() == cancel) {
+			e.consume();
+			return;
+		}
+		TRAY.hideIcon();
+		Platform.exit();
+		System.exit(0);
+	}
+	
+	@FXML
+	private void handleDragStarted(MouseEvent event) {
+	    mouseX = dataTable.getScene().getWindow().getX() - event.getScreenX();
+	    mouseY = dataTable.getScene().getWindow().getY() - event.getScreenY();
 	}
 
+	@FXML
+	private void handleDragged(MouseEvent event) {
+		dataTable.getScene().getWindow().setX(event.getScreenX() + mouseX);
+		dataTable.getScene().getWindow().setY(event.getScreenY() + mouseY);
+	}
+	
 }
