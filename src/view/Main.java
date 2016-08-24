@@ -190,7 +190,11 @@ public class Main extends Application implements Initializable {
 	private void openFile(final File file) {
 		try {
 			FileEncryptor.decryptFile(file, PasswordPrompt.getPassword());
-			final FileInputStream fis = new FileInputStream(new File(file.getAbsolutePath() + ".tmp"));
+			final File decrypted = new File(file.getAbsolutePath() + ".tmp");
+			if (!decrypted.exists()) {
+				return;
+			}
+			final FileInputStream fis = new FileInputStream(decrypted);
 			final ObjectInputStream ois = new ObjectInputStream(fis);
 			List<Entry> list = (ArrayList<Entry>) ois.readObject();
 			ois.close();
@@ -424,6 +428,9 @@ public class Main extends Application implements Initializable {
 			break;
 		case ESCAPE:
 			dataTable.getSelectionModel().select(null);
+			break;
+		case C:
+			if (event.isControlDown()) {handleCopyToClipboard();};
 			break;
 		default:
 			break;

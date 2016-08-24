@@ -22,6 +22,10 @@ public class FileEncryptor {
 
 	private static Cipher makeCipher(String pass, Boolean decryptMode) throws GeneralSecurityException {
 
+		if (pass == null) {
+			return null;
+		}
+		
 		PBEKeySpec keySpec = new PBEKeySpec(pass.toCharArray());
 		SecretKeyFactory keyFactory = SecretKeyFactory.getInstance("PBEWithMD5AndDES");
 		SecretKey key = keyFactory.generateSecret(keySpec);
@@ -48,6 +52,10 @@ public class FileEncryptor {
 
 		Cipher cipher = FileEncryptor.makeCipher(pass, true);
 		FileInputStream inStream = new FileInputStream(inFile);
+		
+		if (cipher == null) {
+			return;
+		}
 
 		int blockSize = 8;
 		int paddedCount = blockSize - ((int) inFile.length() % blockSize);
@@ -74,10 +82,13 @@ public class FileEncryptor {
 		byte[] encData;
 		byte[] decData;
 
+		Cipher cipher = FileEncryptor.makeCipher(pass, false);
+		if (cipher == null) {
+			return;
+		}
+
 		File inFile = new File(file.getAbsolutePath() + ".tmp");
 		copy(file.toPath(), inFile.toPath());
-		Cipher cipher = FileEncryptor.makeCipher(pass, false);
-
 		FileInputStream inStream = new FileInputStream(inFile);
 		encData = new byte[(int) inFile.length()];
 		inStream.read(encData);
@@ -101,7 +112,7 @@ public class FileEncryptor {
 
 	public static void deleteTempFile(final File file) {
 		File inFile = new File(file.getAbsolutePath() + ".tmp");
-		if (!inFile.delete()) {
+		if (!inFile.delete() && inFile.exists()) {
 			throw new IllegalStateException("Unable to delete file: " + file.getAbsolutePath() + ".tmp");
 		}
 	}
