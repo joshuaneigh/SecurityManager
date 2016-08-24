@@ -18,6 +18,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -38,6 +39,8 @@ public class NewEntry implements Initializable {
 	@FXML private DatePicker expires;
 	
 	private Entry editedEntry;
+	private double mouseX;
+	private double mouseY;
 	
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
@@ -117,6 +120,18 @@ public class NewEntry implements Initializable {
 	@FXML
 	private void handleCloseWindow() {
 		((Stage) root.getScene().getWindow()).close();
+	}
+	
+	@FXML
+	private void handleDragStarted(MouseEvent event) {
+	    mouseX = root.getScene().getWindow().getX() - event.getScreenX();
+	    mouseY = root.getScene().getWindow().getY() - event.getScreenY();
+	}
+
+	@FXML
+	private void handleDragged(MouseEvent event) {
+		root.getScene().getWindow().setX(event.getScreenX() + mouseX);
+		root.getScene().getWindow().setY(event.getScreenY() + mouseY);
 	}
 	
 	public void setEntry(final Entry entry) {

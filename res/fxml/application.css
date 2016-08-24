@@ -52,15 +52,6 @@
 	-fx-background-color: white;
 }
 
-.help-button {
-	-fx-background-color: transparent;
-	-fx-text-fill: silver;
-}
-
-.help-button:hover {
-	-fx-background-color: transparent;
-}
-
 .table-column {
 }
 

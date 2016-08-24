@@ -19,7 +19,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane id="root-pane" stylesheets="@application.css" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.Main">
+<AnchorPane id="root-pane" minHeight="150.0" minWidth="475.0" onKeyPressed="#handleKeyPressed" stylesheets="@application.css" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.Main">
    <children>
       <FlowPane id="titlebar" fx:id="titlebar" alignment="CENTER_LEFT" hgap="5.0" minHeight="-Infinity" minWidth="-Infinity" onMouseDragged="#handleDragged" onMousePressed="#handleDragStarted" prefHeight="35.0" prefWidth="35.0" rowValignment="TOP" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -49,10 +49,10 @@
                         <Button mnemonicParsing="false" onAction="#handleOpenFile" text="Open" />
                         <Button mnemonicParsing="false" onAction="#handleSaveFile" text="Save" />
                         <Separator orientation="VERTICAL" />
-                        <Button mnemonicParsing="false" onAction="#handleHelp" styleClass="help-button" text="Help" />
+                        <Button mnemonicParsing="false" onAction="#handleHelp" text="Help" />
                     </items>
                   </ToolBar>
-                  <TableView id="table-view" fx:id="dataTable" onKeyPressed="#handleKeyPressed" onMouseClicked="#handleMouseClicked" VBox.vgrow="ALWAYS">
+                  <TableView id="table-view" fx:id="dataTable" onKeyPressed="#handleKeyPressed" onMouseClicked="#handleMouseClicked" prefWidth="595.0" VBox.vgrow="ALWAYS">
                     <columns>
                       <TableColumn fx:id="titleColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="120.0" text="Title" />
                       <TableColumn fx:id="userNameColumn" editable="false" maxWidth="1.7976931348623157E308" minWidth="-Infinity" prefWidth="120.0" text="User Name" />
@@ -78,7 +78,7 @@
                </padding>
             </VBox>
             <TextField id="searchbar" fx:id="searchField" prefHeight="25.0" prefWidth="201.0" promptText="Search" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0" />
-            <Text id="search-icon" fx:id="searchClear" fill="#a0a0a0" layoutX="578.0" layoutY="21.0" onMouseClicked="#handleClearSearch" strokeType="OUTSIDE" strokeWidth="0.0" text="X" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="9.0">
+            <Text id="search-icon" fx:id="searchClear" layoutX="578.0" layoutY="21.0" onMouseClicked="#handleClearSearch" strokeType="OUTSIDE" strokeWidth="0.0" text="X" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="9.0">
                <font>
                   <Font name="Eras Light ITC" size="14.0" />
                </font>
@@ -90,42 +90,42 @@
             </Text>
          </children>
       </AnchorPane>
-      <Region layoutX="-7.0" layoutY="-7.0" prefHeight="10.0" prefWidth="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <Region layoutX="-7.0" layoutY="-7.0" onMouseDragged="#handleResizeDrag" onMousePressed="#handleResizeStart" onMouseReleased="#handleResizeEnd" prefHeight="10.0" prefWidth="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0">
          <cursor>
             <Cursor fx:constant="NW_RESIZE" />
          </cursor>
       </Region>
-      <Region prefHeight="5.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="0.0">
+      <Region onMouseDragged="#handleResizeDrag" onMousePressed="#handleResizeStart" onMouseReleased="#handleResizeEnd" prefHeight="5.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
          <cursor>
             <Cursor fx:constant="N_RESIZE" />
          </cursor>
       </Region>
-      <Region prefHeight="10.0" prefWidth="10.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <Region onMouseDragged="#handleResizeDrag" onMousePressed="#handleResizeStart" onMouseReleased="#handleResizeEnd" prefHeight="10.0" prefWidth="10.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <cursor>
             <Cursor fx:constant="NE_RESIZE" />
          </cursor>
       </Region>
-      <Region prefWidth="5.0" AnchorPane.bottomAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="15.0">
+      <Region onMouseDragged="#handleResizeDrag" onMousePressed="#handleResizeStart" onMouseReleased="#handleResizeEnd" prefWidth="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
          <cursor>
             <Cursor fx:constant="E_RESIZE" />
          </cursor>
       </Region>
-      <Region prefHeight="10.0" prefWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+      <Region onMouseDragged="#handleResizeDrag" onMousePressed="#handleResizeStart" onMouseReleased="#handleResizeEnd" prefHeight="10.0" prefWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <cursor>
             <Cursor fx:constant="SE_RESIZE" />
          </cursor>
       </Region>
-      <Region prefHeight="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="15.0">
+      <Region onMouseDragged="#handleResizeDrag" onMousePressed="#handleResizeStart" onMouseReleased="#handleResizeEnd" prefHeight="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
          <cursor>
             <Cursor fx:constant="S_RESIZE" />
          </cursor>
       </Region>
-      <Region prefHeight="10.0" prefWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
+      <Region onMouseDragged="#handleResizeDrag" onMousePressed="#handleResizeStart" onMouseReleased="#handleResizeEnd" prefHeight="10.0" prefWidth="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0">
          <cursor>
             <Cursor fx:constant="SW_RESIZE" />
          </cursor>
       </Region>
-      <Region prefWidth="5.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="15.0">
+      <Region onMouseDragged="#handleResizeDrag" onMousePressed="#handleResizeStart" onMouseReleased="#handleResizeEnd" prefWidth="5.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="10.0">
          <cursor>
             <Cursor fx:constant="W_RESIZE" />
          </cursor>

@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.Desktop;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.Toolkit;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URL;
+import java.security.GeneralSecurityException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,11 +58,20 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
-
 import model.Entry;
+import model.FileEncryptor;
 import model.Tray;
 
 public class Main extends Application implements Initializable {
+	
+	private static final byte NORTH = 0;
+	private static final byte NORTHEAST = 1;
+	private static final byte EAST = 2;
+	private static final byte SOUTHEAST = 3;
+	private static final byte SOUTH = 4;
+	private static final byte SOUTHWEST = 5;
+	private static final byte WEST = 6;
+	private static final byte NORTHWEST = 7;
 	
 	private static String FXML_PATH;
 	private static ObservableList<Entry> ENTRY_LIST;
@@ -70,7 +81,8 @@ public class Main extends Application implements Initializable {
 	
 	private double mouseX;
 	private double mouseY;
-
+	private byte resizeDirection;
+	
 	@FXML private FlowPane titlebar;
 	@FXML private ImageView icon;
 	@FXML private Text title;	
@@ -125,6 +137,8 @@ public class Main extends Application implements Initializable {
 		}
 		Platform.setImplicitExit(false);
 		primaryStage.initStyle(StageStyle.TRANSPARENT);
+		primaryStage.setMinHeight(150);
+		primaryStage.setMinWidth(475);
 		primaryStage.setTitle("SecurityManager");
 		primaryStage.getIcons().add(new Image(new FileInputStream("./res/images/icon.png")));
 		primaryStage.setOnCloseRequest(e -> handleCloseRequest(e));
@@ -144,56 +158,49 @@ public class Main extends Application implements Initializable {
 	
 	public void checkExpirationDates() {
 		int expiredCounter = 0;
-		String expired = null;
+		String title = null;
+		String date = null;
 		for (final Entry entry : ENTRY_LIST) {
 			if (entry.getExpires() != null && entry.getExpires().compareTo(LocalDate.now()) <= 0) {
 				expiredCounter++;
-				expired = entry.getTitle();
+				title = entry.getTitle();
+				date = entry.getExpires().toString();
 				// TODO: Set cell to red
 			}
 		}
 		
 		final String message;
-		final int messageType;
+		final byte messageType;
 		if (expiredCounter > 1) {
-			message = "Your password, " + expired + ", and \n" + expiredCounter + " others have expired.";
+			message = "Your password, " + title + ", and \n" + (expiredCounter - 1) + " others have expired.";
 			messageType = Notification.WARNING;
 		} else if (expiredCounter == 1) {
-			message = "Your password, " + expired + ",\n has expired.";
+			message = "Your password, " + title + ",\nhas expired on " + date + '.';
 			messageType = Notification.WARNING;
 		} else {
 			message = "All passwords are up to date.";
 			messageType = Notification.SUCCESS;
 		}
 
-		final Stage stage = new Stage();
-		try {
-			final FXMLLoader loader = new FXMLLoader();
-			final Scene scene = new Scene(loader.load(new FileInputStream(FXML_PATH + "Notification.fxml")));
-			final Notification controller = loader.getController();
-			controller.setMessageType(messageType);
-			controller.setMessage(message);
-			scene.setFill(null);
-			scene.getStylesheets().add((new File(FXML_PATH + "application.css")).toURI().toURL().toExternalForm());
-			stage.setScene(scene);
-			controller.show();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
+		Notification.showNotification(message, messageType);
+		
 	}
 	
 	@SuppressWarnings("unchecked")
 	private void openFile(final File file) {
 		try {
-			final FileInputStream fis = new FileInputStream(file);
+			FileEncryptor.decryptFile(file, PasswordPrompt.getPassword());
+			final FileInputStream fis = new FileInputStream(new File(file.getAbsolutePath() + ".tmp"));
 			final ObjectInputStream ois = new ObjectInputStream(fis);
 			List<Entry> list = (ArrayList<Entry>) ois.readObject();
 			ois.close();
 			ENTRY_LIST.removeAll(ENTRY_LIST);
 			ENTRY_LIST.addAll(list);
 			checkExpirationDates();
-		} catch (IOException | ClassNotFoundException e) {
+		} catch (IOException | ClassNotFoundException | GeneralSecurityException e) {
 			e.printStackTrace();
+		} finally {
+			FileEncryptor.deleteTempFile(file);
 		}
 	}
 	
@@ -203,7 +210,8 @@ public class Main extends Application implements Initializable {
 			final ObjectOutputStream oos = new ObjectOutputStream(fos);
 			oos.writeObject(new ArrayList<Entry>(ENTRY_LIST));
 			oos.close();
-		} catch (IOException e) {
+			FileEncryptor.encryptFile(file, PasswordPrompt.getPassword());
+		} catch (IOException | GeneralSecurityException e) {
 			e.printStackTrace();
 		}
 		
@@ -242,7 +250,7 @@ public class Main extends Application implements Initializable {
 		expiresColumn.setCellValueFactory(new PropertyValueFactory<Entry, LocalDate>("expires"));
 		
 		dataTable.focusedProperty().addListener((observable, oldValue, newValue) -> {
-			if (!newValue) {
+			if (!newValue && !(dataTable.getScene().getFocusOwner() instanceof Button)) {
 				dataTable.getSelectionModel().select(null);
 			}
 		});
@@ -269,7 +277,7 @@ public class Main extends Application implements Initializable {
             	String lowerCaseFilter = newValue.toLowerCase();
                 if (entry.getTitle().toLowerCase().contains(lowerCaseFilter) || entry.getUsername().toLowerCase().contains(lowerCaseFilter)
                 		|| entry.getUrl().toLowerCase().contains(lowerCaseFilter) || entry.getNotes().toLowerCase().contains(lowerCaseFilter)
-                		|| entry.getNotes().toLowerCase().contains(lowerCaseFilter) ) {
+                		|| entry.getNotes().toLowerCase().contains(lowerCaseFilter) || entry.getExpires().toString().contains(lowerCaseFilter)) {
                     return true; 
                 } else {
                 	return false;
@@ -340,8 +348,11 @@ public class Main extends Application implements Initializable {
 	@FXML
 	private void handleOpenFile() {
 		final FileChooser fc = new FileChooser();
-		fc.setTitle("Open Password File");
-		final File file = fc.showOpenDialog(new Stage());
+		fc.setTitle("Open File");
+		fc.setInitialDirectory(new File("./data"));
+		fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SecurityManager File", "*.smf"),
+				new FileChooser.ExtensionFilter("All Files", "*.*"));
+		final File file = fc.showOpenDialog(dataTable.getScene().getWindow());
 		if (file != null) {
 			openFile(file);
 		}
@@ -350,8 +361,11 @@ public class Main extends Application implements Initializable {
 	@FXML
 	private void handleSaveFile() {
 		final FileChooser fc = new FileChooser();
-		fc.setTitle("Save Password File");
-		final File file = fc.showSaveDialog(new Stage());
+		fc.setTitle("Save File");
+		fc.setInitialDirectory(new File("./data"));
+		fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SecurityManager File", "*.smf"),
+				new FileChooser.ExtensionFilter("All Files", "*.*"));
+		final File file = fc.showSaveDialog(dataTable.getScene().getWindow());
 		if (file != null) {
 			saveFile(file);
 		}
@@ -359,7 +373,12 @@ public class Main extends Application implements Initializable {
 	
 	@FXML
 	private void handleHelp() {
-		
+		System.out.println("Help");
+		try {
+			Desktop.getDesktop().open(new File("./res/help.html"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@FXML
@@ -463,6 +482,67 @@ public class Main extends Application implements Initializable {
 	private void handleDragged(MouseEvent event) {
 		dataTable.getScene().getWindow().setX(event.getScreenX() + mouseX);
 		dataTable.getScene().getWindow().setY(event.getScreenY() + mouseY);
+	}
+	
+	@FXML
+	private void handleResizeStart(MouseEvent event) {
+	    final int x = (int) event.getSceneX();
+	    final int y = (int) event.getSceneY();
+	    final int endX = (int) (dataTable.getScene().getWindow().getWidth() - x);
+	    final int endY = (int) (dataTable.getScene().getWindow().getHeight() - y);
+	    
+	    if (y <= 10) {
+	    	if (x <= 10) {
+	    		resizeDirection = NORTHWEST;
+	    	} else if (endX <= 10) {
+	    		resizeDirection = NORTHEAST;
+	    	} else if (y <= 5) {
+	    		resizeDirection = NORTH;
+	    	}
+	    } else if (endY <= 10) {
+	    	if (x <= 10) {
+	    		resizeDirection = SOUTHWEST;
+	    	} else if (endX <= 10) {
+	    		resizeDirection = SOUTHEAST;
+	    	} else if (endY <= 5) {
+	    		resizeDirection = SOUTH;
+	    	}
+	    } else if (x <= 5) {
+	    	resizeDirection = WEST;
+	    } else {
+	    	resizeDirection = EAST;
+	    }
+	    System.out.println(resizeDirection);
+	    System.out.println(x + ", " + endX);
+	    System.out.println(y + ", " + endY);
+	}
+	
+	@FXML
+	private void handleResizeEnd(MouseEvent event) {
+		resizeDirection = -1;
+	}
+	
+	@FXML
+	private void handleResizeDrag(MouseEvent event) {
+		final int dx = (int) (dataTable.getScene().getWindow().getX() - event.getScreenX());
+		final int dy = (int) (dataTable.getScene().getWindow().getY() - event.getScreenY());
+		final Scene scene = dataTable.getScene();
+		final Stage stage = (Stage) scene.getWindow();
+
+		if (resizeDirection == NORTHWEST || resizeDirection == NORTH || resizeDirection == NORTHEAST) {
+			stage.setHeight(Math.max(scene.getHeight() + dy, stage.getMinHeight()));
+			stage.setY(event.getScreenY());
+		}
+		if (resizeDirection == SOUTHWEST || resizeDirection == WEST || resizeDirection == NORTHWEST) {
+			stage.setWidth(Math.max(scene.getWidth() + dx, stage.getMinWidth()));
+			stage.setX(event.getScreenX());
+		}
+		if (resizeDirection == NORTHEAST || resizeDirection == EAST || resizeDirection == SOUTHEAST) {
+			stage.setWidth(Math.max(event.getSceneX(), stage.getMinWidth()));
+		}
+		if (resizeDirection == SOUTHWEST || resizeDirection == SOUTH || resizeDirection == SOUTHEAST) {
+			stage.setHeight(Math.max(event.getSceneY(), stage.getMinHeight()));
+		}
 	}
 	
 }
