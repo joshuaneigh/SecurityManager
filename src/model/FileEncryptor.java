@@ -51,12 +51,11 @@ public class FileEncryptor {
 		byte[] encData;
 
 		Cipher cipher = FileEncryptor.makeCipher(pass, true);
-		FileInputStream inStream = new FileInputStream(inFile);
-		
 		if (cipher == null) {
 			return;
 		}
-
+		
+		FileInputStream inStream = new FileInputStream(inFile);
 		int blockSize = 8;
 		int paddedCount = blockSize - ((int) inFile.length() % blockSize);
 		int padded = (int) inFile.length() + paddedCount;

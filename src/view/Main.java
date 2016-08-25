@@ -79,6 +79,7 @@ public class Main extends Application implements Initializable {
 	
 	private final ScheduledExecutorService scheduler;
 	
+	private boolean initialNotification;
 	private double mouseX;
 	private double mouseY;
 	private byte resizeDirection;
@@ -182,7 +183,12 @@ public class Main extends Application implements Initializable {
 			messageType = Notification.SUCCESS;
 		}
 
-		Notification.showNotification(message, messageType);
+		if (initialNotification) {
+			initialNotification = false;
+			Notification.showNotification(message, messageType);
+		} else {
+			Notification.showNotificationNoTimeout(message, messageType);
+		}
 		
 	}
 	
@@ -200,6 +206,7 @@ public class Main extends Application implements Initializable {
 			ois.close();
 			ENTRY_LIST.removeAll(ENTRY_LIST);
 			ENTRY_LIST.addAll(list);
+			initialNotification = true;
 			checkExpirationDates();
 		} catch (IOException | ClassNotFoundException | GeneralSecurityException e) {
 			e.printStackTrace();
@@ -234,11 +241,13 @@ public class Main extends Application implements Initializable {
 	private void setupTray() {
 		final PopupMenu menu = new PopupMenu("Popup");
 		
-		final MenuItem restore = new MenuItem("Restore...");
+		final MenuItem restore = new MenuItem("Open SecurityManager");
 		restore.addActionListener(e -> Platform.runLater(() -> ((Stage) dataTable.getScene().getWindow()).show()));
 		menu.add(restore);
 		
-		final MenuItem close = new MenuItem("Close");
+		menu.addSeparator();
+		
+		final MenuItem close = new MenuItem("Exit");
 		close.addActionListener(e -> handleCloseWindow());
 		menu.add(close);
 		
@@ -352,6 +361,10 @@ public class Main extends Application implements Initializable {
 	@FXML
 	private void handleOpenFile() {
 		final FileChooser fc = new FileChooser();
+		final File dir = new File("./data");
+		if (!dir.exists()) {
+			dir.mkdirs();
+		}
 		fc.setTitle("Open File");
 		fc.setInitialDirectory(new File("./data"));
 		fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SecurityManager File", "*.smf"),
@@ -365,6 +378,10 @@ public class Main extends Application implements Initializable {
 	@FXML
 	private void handleSaveFile() {
 		final FileChooser fc = new FileChooser();
+		final File dir = new File("./data");
+		if (!dir.exists()) {
+			dir.mkdirs();
+		}
 		fc.setTitle("Save File");
 		fc.setInitialDirectory(new File("./data"));
 		fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SecurityManager File", "*.smf"),

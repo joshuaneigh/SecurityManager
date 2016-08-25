@@ -1,14 +1,10 @@
 package model;
 
 import java.awt.AWTException;
-import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
-import java.awt.image.ImageObserver;
-import java.awt.image.ImageProducer;
-import java.io.File;
 import java.net.URL;
 
 import javax.swing.ImageIcon;

@@ -59,6 +59,26 @@ public class Notification {
 			scene.getStylesheets().add((new File(FXML_PATH + "application.css")).toURI().toURL().toExternalForm());
 			stage.setScene(scene);
 			controller.show();
+			PauseTransition delay = new PauseTransition(Duration.seconds(5));
+			delay.setOnFinished( event -> stage.close() );
+			delay.play();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+	}
+	
+	public static void showNotificationNoTimeout(final String message, final byte messageType) {
+		final Stage stage = new Stage();
+		try {
+			final FXMLLoader loader = new FXMLLoader();
+			final Scene scene = new Scene(loader.load(new FileInputStream(FXML_PATH + "Notification.fxml")));
+			final Notification controller = loader.getController();
+			controller.setMessageType(messageType);
+			controller.setMessage(message);
+			scene.setFill(null);
+			scene.getStylesheets().add((new File(FXML_PATH + "application.css")).toURI().toURL().toExternalForm());
+			stage.setScene(scene);
+			controller.show();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
@@ -71,9 +91,7 @@ public class Notification {
 		stage.show();
 		stage.setX(bounds.getMinX() + bounds.getWidth() - stage.getWidth() - 10);
 		stage.setY(bounds.getMinY() + bounds.getHeight() - stage.getHeight() - 10);
-		PauseTransition delay = new PauseTransition(Duration.seconds(5));
-		delay.setOnFinished( event -> stage.close() );
-		delay.play();
+		
 	}
 	
 	public void setTitle(final String text) {
