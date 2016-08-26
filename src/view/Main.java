@@ -288,9 +288,15 @@ public class Main extends Application implements Initializable {
             		return true;
             	}
             	String lowerCaseFilter = newValue.toLowerCase();
-                if (entry.getTitle().toLowerCase().contains(lowerCaseFilter) || entry.getUsername().toLowerCase().contains(lowerCaseFilter)
-                		|| entry.getUrl().toLowerCase().contains(lowerCaseFilter) || entry.getNotes().toLowerCase().contains(lowerCaseFilter)
-                		|| entry.getNotes().toLowerCase().contains(lowerCaseFilter) || entry.getExpires().toString().contains(lowerCaseFilter)) {
+                if (entry.getTitle().toLowerCase().contains(lowerCaseFilter)) {
+                	return true;
+                } else if (entry.getUsername().toLowerCase().contains(lowerCaseFilter)) {
+                	return true;
+                } else if (entry.getUrl().toLowerCase().contains(lowerCaseFilter)) {
+                	return true;
+                } else if (entry.getNotes().toLowerCase().contains(lowerCaseFilter)) {
+                	return true;
+                } else if (entry.getExpires() != null && entry.getExpires().toString().contains(lowerCaseFilter)) {
                     return true; 
                 } else {
                 	return false;
@@ -394,7 +400,6 @@ public class Main extends Application implements Initializable {
 	
 	@FXML
 	private void handleHelp() {
-		System.out.println("Help");
 		try {
 			Desktop.getDesktop().open(new File("./res/help.html"));
 		} catch (IOException e) {
@@ -536,9 +541,6 @@ public class Main extends Application implements Initializable {
 	    } else {
 	    	resizeDirection = EAST;
 	    }
-	    System.out.println(resizeDirection);
-	    System.out.println(x + ", " + endX);
-	    System.out.println(y + ", " + endY);
 	}
 	
 	@FXML
