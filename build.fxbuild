@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ASCII"?>
+<anttasks:AntTask xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:anttasks="http://org.eclipse.fx.ide.jdt/1.0" buildDirectory="${project}/build" cssToBin="true">
+  <deploy height="600" width="800">
+    <application name="SecurityManager 2.0" mainclass="application.Main" preloaderclass="" version="2.0.1"/>
+    <info title="Security Manager" vendor="System42"/>
+  </deploy>
+  <signjar/>
+</anttasks:AntTask>

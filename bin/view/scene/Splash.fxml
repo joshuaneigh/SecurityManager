@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<VBox stylesheets="/view/application.css" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.scene.SplashController">
+   <children>
+      <HBox>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+         <children>
+            <ImageView fx:id="icon" fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </ImageView>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Security Manager">
+               <font>
+                  <Font size="24.0" />
+               </font>
+            </Text>
+         </children>
+      </HBox>
+      <Separator prefHeight="1.0" prefWidth="398.0">
+         <VBox.margin>
+            <Insets bottom="5.0" top="5.0" />
+         </VBox.margin>
+      </Separator>
+      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Version 2.0.1" />
+      <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Build: 05 December 2016" />
+      <ProgressBar fx:id="progress" prefHeight="23.0" prefWidth="395.0" progress="0.0">
+         <padding>
+            <Insets bottom="5.0" top="15.0" />
+         </padding>
+      </ProgressBar>
+      <Text fx:id="message" strokeType="OUTSIDE" strokeWidth="0.0" text="Task Message" />
+      <Text fx:id="numTasks" strokeType="OUTSIDE" strokeWidth="0.0" text="Task X of X" />
+      <HBox alignment="CENTER_RIGHT" prefHeight="0.0" prefWidth="398.0">
+         <children>
+            <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Copyright © Joshua Neighbarger, 2017">
+               <HBox.margin>
+                  <Insets top="15.0" />
+               </HBox.margin>
+            </Text>
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</VBox>
