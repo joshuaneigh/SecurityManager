@@ -1,1 +1,6 @@
-/bin
+# Compiled Files
+bin/
+
+# Eclipse Files
+.settings/
+.project
